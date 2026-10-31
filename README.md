@@ -34,3 +34,10 @@ The trade-off is that the pager holds no open directory handle between fetches. 
 If the directory changes between pages — entries added or removed — the skip offset will land on a different entry than it would have on a stable directory. You may see a duplicate or a gap. This is the accepted trade-off for not holding a handle open. If you need stable iteration over a changing directory, hold an `os.scandir` handle yourself instead.
 
 Calling `next_page()` after the final page raises `PageError`. The final page is whichever page has `has_more == False`.
+
+## Design notes
+
+The window stores values eagerly rather than keeping running aggregates. Running
+sums drift with floating point over long streams, and recomputing from a small
+buffer is cheap enough that the drift is not worth the speed.
+
